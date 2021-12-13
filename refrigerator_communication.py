@@ -1,3 +1,12 @@
+'''
+cd /dev
+ls | grep USB
+一般会显示: ttyUSB0
+sudo chmod 666 /dev/ttyUSB0
+'''
+
+
+
 import serial
 import serial.tools.list_ports
 from struct import unpack, pack
@@ -185,9 +194,9 @@ class Communication():
 # Communication.Print_Used_Com()
 # Ret =False #是否创建成功标志
 #
-# Engine1 = Communication("com5",19200,0.5)
+# Engine1 = Communication("/dev/ttyUSB0",19200,0.5)
 # if (Ret):
-#     print(Engine1.set_temperature(-70))
+#     print(Engine1.set_temperature(10))
 #     print(Engine1.check_temperature(1))
 #     Engine1.Operation_options(1)
 #     #Engine1.Recive_data(1)

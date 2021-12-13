@@ -13,7 +13,7 @@ from refrigerator_communication import Communication
 
 if __name__ == '__main__':
     print('按下回车开始计时，按下 Ctrl + C 停止计时。')
-    Engine1 = Communication("com5", 19200, 0.5)
+    Engine1 = Communication('/dev/ttyUSB', 19200, 0.5)
     while True:
         input("")  # 如果是 python 2.x 版本请使用 raw_input()
         starttime = time.time()
