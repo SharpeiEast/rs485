@@ -7,9 +7,23 @@
 import os
 import time
 from refrigerator_communication import Communication
+from http_sender import CGI_CMD
 
+def temp_difference_cgi_qt(Tx, lidar):  # lidar应该是一个类，qt = CGI_CMD(host='192.168.1.201')，Tx一般是恒温槽温度
+    RX_temp = lidar.cgi_get_factory_monitor()['Body']['TempRxAvrg'] #读取rx的平均温度
+    return Tx - float(RX_temp)
 
-
+# def temp_rising(lidar,Engine,target_tempera):
+#     Diff = temp_difference_cgi_qt(target_tempera, lidar)
+#     if Diff < 0:
+#         return '雷达温度超限，拔线降温'
+#     elif:
+#         Diff < 20:
+#
+#         return '逼近目标温度，调整温槽温度为： '
+#
+def temperas_record(lidar,Engine1,file_name):
+    return 1
 
 if __name__ == '__main__':
     print('按下回车开始计时，按下 Ctrl + C 停止计时。')
