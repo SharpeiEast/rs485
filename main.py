@@ -7,7 +7,7 @@
 import os
 import time
 from refrigerator_communication import Communication
-from http_sender import CGI_CMD
+from qt_http_sender import CGI_CMD
 
 def temp_difference_cgi_qt(Tx, lidar):  # lidar应该是一个类，qt = CGI_CMD(host='192.168.1.201')，Tx一般是恒温槽温度
     RX_temp = lidar.cgi_get_factory_monitor()['Body']['TempRxAvrg'] #读取rx的平均温度
@@ -27,7 +27,8 @@ def temperas_record(lidar,Engine1,file_name):
 
 if __name__ == '__main__':
     print('按下回车开始计时，按下 Ctrl + C 停止计时。')
-    Engine1 = Communication('/dev/ttyUSB', 19200, 0.5)
+    Engine1 = Communication('/dev/ttyUSB0', 19200, 0.5)
+    Lidar = CGI_CMD(host='192.168.1.201')
     while True:
         input("")  # 如果是 python 2.x 版本请使用 raw_input()
         starttime = time.time()
@@ -36,20 +37,29 @@ if __name__ == '__main__':
         try:
             while True:
                 print('计时: ', round(time.time() - starttime, 0), '秒')  # , end="\r")
-                f = open('record_time.txt', 'a')
+                f = open('record_time_temp.txt', 'a')
                 f.write('time:' + str(round( time.time()  - starttime, 1) )+ '秒')
                # f.write('\r\n')
-                f.write('\n')
-                f.close()
+               #  f.write('\n')
+               #  f.close()
                # t_list, judge,rx_temp = temp_judge(t_list)
-                current_tempera = Engine1.check_temperature(1)
-                print('Temp is ' + str(current_tempera))
-                print('***')
+                current_tempera_1 = Engine1.check_temperature(1)
+                current_tempera_2 = Engine1.check_temperature(2)
+                current_tempera_set = Engine1.check_temperature(3)
+                Lidar_tempera = Lidar.cgi_get_factory_monitor()['Body']['TempRxAvrg']
+                print('RS485 Temp is ' + str(round(current_tempera_1,2)) + ' ℃')
+                print('Envir temp is ' + str(round(current_tempera_2,2)) + ' ℃')
+                print('Target temp is ' + str(current_tempera_set) + ' ℃')
+                print('Lidar temp is ' + str(Lidar_tempera) + ' ℃')
+                print('*'*20)
               #  print('t_list: ',t_list)
               #  print(judge)
-                print('---')
-                f = open('record_tempera.txt', 'a')
-                f.write('Temp: ' + str(current_tempera))
+                print('-'*20)
+                # f = open('record_tempera.txt', 'a')
+                f.write(' RSTemp: ' + str(current_tempera_1))
+                f.write(' ENTemp: ' + str(current_tempera_2))
+                f.write(' Target: ' + str(current_tempera_set))
+                f.write(' Lidar_T: ' + str(Lidar_tempera))
                 f.write('\n')
                 # if judge:
                 #     f.write('  Record Point Cloud')
