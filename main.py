@@ -26,6 +26,7 @@ def temperas_record(lidar,Engine1,file_name):
     return 1
 
 if __name__ == '__main__':
+    file_name = time.strftime("%Y-%m-%d~%H-%M-%S", time.localtime()) + '.txt'
     print('按下回车开始计时，按下 Ctrl + C 停止计时。')
     Engine1 = Communication('/dev/ttyUSB0', 19200, 0.5)
     Lidar = CGI_CMD(host='192.168.1.201')
@@ -37,7 +38,6 @@ if __name__ == '__main__':
         try:
             while True:
                 print('计时: ', round(time.time() - starttime, 0), '秒')  # , end="\r")
-                file_name = time.strftime("%Y-%m-%d~%H-%M-%S", time.localtime()) + '.txt'
                 f = open(file_name, 'a')
                 f.write('time:' + str(round( time.time()  - starttime, 1) )+ '秒')
                # f.write('\r\n')
