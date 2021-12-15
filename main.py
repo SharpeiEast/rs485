@@ -37,7 +37,8 @@ if __name__ == '__main__':
         try:
             while True:
                 print('计时: ', round(time.time() - starttime, 0), '秒')  # , end="\r")
-                f = open('record_time_temp.txt', 'a')
+                file_name = time.strftime("%Y-%m-%d~%H-%M-%S", time.localtime()) + '.txt'
+                f = open(file_name, 'a')
                 f.write('time:' + str(round( time.time()  - starttime, 1) )+ '秒')
                # f.write('\r\n')
                #  f.write('\n')
