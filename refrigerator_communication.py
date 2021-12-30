@@ -10,6 +10,9 @@ sudo chmod 666 /dev/ttyUSB0
 import serial
 import serial.tools.list_ports
 from struct import unpack, pack
+import random
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Communication():
 
@@ -189,14 +192,65 @@ class Communication():
         plt.clf()
         return '绘图完毕'
 
+class dynamic_figure():
+    def __init__(self,xlim, l_ylim, h_ylim):
+        self.xlim = xlim
+        self.l_ylim = l_ylim
+        self.h_ylim = h_ylim
+        plt.ion()
+        self.fig = plt.figure(1,figsize=(18,8),facecolor='white')
+        self.ax = self.fig.add_subplot(111)
+        self.ax.grid(ls='--')
+        self.ax.set_xlim(0,self.xlim)
+        self.ax.set_ylim(self.l_ylim, self.h_ylim)
+        self.f1text = self.ax.text(5, self.h_ylim - 5, '', fontsize=12)
+        self.f2text = self.ax.text(5, self.h_ylim - 10, '', fontsize=12)
+        self.f3text = self.ax.text(5, self.h_ylim - 15, '', fontsize=12)
+        self.f4text = self.ax.text(5, self.h_ylim - 20, '', fontsize=12)
+        self.x = []
+        self.y1 = []
+        self.y2 = []
+        self.y3 = []
+        self.y4 = []
+    def update(self,newx,newy1,newy2,newy3,newy4):
+        xmin, xmax = self.ax.get_xlim()
+        self.x.append(newx)
+        self.y1.append(newy1)
+        self.y2.append(newy2)
+        self.y3.append(newy3)
+        self.y4.append(newy4)
 
+        if xmax - newx < 0:
+            self.ax.set_xlim(xmax, xmax + self.xlim)
+            self.f1text = self.ax.text(xmax + 5, self.h_ylim - 5, '', fontsize=12)
+            self.f2text = self.ax.text(xmax + 5, self.h_ylim - 10, '', fontsize=12)
+            self.f3text = self.ax.text(xmax + 5, self.h_ylim - 15, '', fontsize=12)
+            self.f4text = self.ax.text(xmax + 5, self.h_ylim - 20, '', fontsize=12)
+        self.ax.plot(self.x, self.y1, c='r', ls='-', marker='o', mec='b', mfc='w')  ## 保存历史数据
+        self.ax.plot(self.x, self.y2, c='b', ls='--', marker='o', mec='b', mfc='w')  ## 保存历史数据
+        self.ax.plot(self.x, self.y3, c='g', ls='-.', marker='o', mec='b', mfc='w')
+        # self.ax.plot(self.x, self.y3, c='g', ls='-.', marker='o', mec='b', mfc='w')
+            # plt.plot(t, np.sin(t), 'o')
+        self.f1text.set_text('T1 (red) =   %.3f' % newy1)
+        self.f2text.set_text('T2 (blue) =  %.3f' % newy2)
+        self.f3text.set_text('TS (xxx) =   %.3f' % newy4)
+        self.f4text.set_text('TL (green) = %.3f' % newy3)
+        plt.pause(0.1)
+
+# t = 0
+# d_F = dynamic_figure(80,-50,120)
+# while True:
+#     t += np.pi / 4
+#     y1 = np.sin(t)
+#     y2 = np.sin(t) + 0.2
+#     d_F.update(t, y1, y2)
 
 # Communication.Print_Used_Com()
 # Ret =False #是否创建成功标志
 #
 # Engine1 = Communication("/dev/ttyUSB0",19200,0.5)
 # if (Ret):
-#     print(Engine1.set_temperature(10))
-#     print(Engine1.check_temperature(1))
+#     print(Engine1.set_temperature(-50))
+#     print(Engine1.check_temperature(2))
 #     Engine1.Operation_options(1)
-#     #Engine1.Recive_data(1)
+    #Engine1.Recive_data(1)

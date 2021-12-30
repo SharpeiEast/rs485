@@ -1,7 +1,7 @@
 import json
 import time
 import requests
-
+from requests.exceptions import ConnectionError, ConnectTimeout
 
 class CGI_CMD():
 
@@ -12,7 +12,7 @@ class CGI_CMD():
     def cgi_get_device_info(self):
         get_param = {'action': 'get',
                      'object': 'device_info'}
-        response = requests.get(self.base_url, params=get_param)
+        response = requests.get(self.base_url, params=get_param, timeout=1)
         re = json.loads(response.text)
         print(re)
         return re
@@ -320,13 +320,13 @@ class CGI_CMD():
     def cgi_get_factory_monitor(self):
         set_param = {'action': 'get',
                      'object': 'factory_monitor'}
-        response = requests.get(self.base_url, params=set_param)
+        response = requests.get(self.base_url, params=set_param, timeout=1)
         re = json.loads(response.text)
         return re
 
-
+#
 # if __name__ == '__main__':
-    # cgi = CGI_CMD(host='192.168.1.201')
+#     cgi = CGI_CMD(host='192.168.1.201')
     # cgi.cgi_get_device_info()
     # cgi.cgi_get_lidar_config()
     # cgi.cgi_get_ethernet_all()
@@ -360,6 +360,7 @@ class CGI_CMD():
     # cgi.cgi_set_channel_config_switch(48)
     # cgi.cgi_get_channel_config_switch()
     # re = cgi.cgi_get_factory_monitor()
-    # rx_temp = re['Body']['TempRxAvrg']
+    # print(re['Body'])
+    # rx_temp = re['Body']['TempTxAvrg']
     # print(rx_temp)
 
