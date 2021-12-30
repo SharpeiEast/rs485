@@ -32,7 +32,7 @@ class Communication():
              if (self.main_engine.is_open):
                Ret = True
         except Exception as e:
-            print("---异常---：", e)
+            print("---异常---： (胖子，你是不是没连温槽？)", e)
 
     # 打印设备基本信息
     def Print_Name(self):
@@ -203,15 +203,18 @@ class dynamic_figure():
         self.ax.grid(ls='--')
         self.ax.set_xlim(0,self.xlim)
         self.ax.set_ylim(self.l_ylim, self.h_ylim)
-        self.f1text = self.ax.text(5, self.h_ylim - 5, '', fontsize=12)
-        self.f2text = self.ax.text(5, self.h_ylim - 10, '', fontsize=12)
-        self.f3text = self.ax.text(5, self.h_ylim - 15, '', fontsize=12)
-        self.f4text = self.ax.text(5, self.h_ylim - 20, '', fontsize=12)
+        self.text = self.ax.text(1, self.h_ylim - 5, '', fontsize=12)
+        # self.f2text = self.ax.text(5, self.h_ylim - 10, '', fontsize=12)
+        # self.f3text = self.ax.text(5, self.h_ylim - 15, '', fontsize=12)
+        # self.f4text = self.ax.text(5, self.h_ylim - 20, '', fontsize=12)
         self.x = []
         self.y1 = []
         self.y2 = []
         self.y3 = []
         self.y4 = []
+
+        self.ax.set_xlabel("Time", fontsize=20)
+        self.ax.set_ylabel('Temperature', fontsize=20)
     def update(self,newx,newy1,newy2,newy3,newy4):
         xmin, xmax = self.ax.get_xlim()
         self.x.append(newx)
@@ -226,15 +229,19 @@ class dynamic_figure():
             self.f2text = self.ax.text(xmax + 5, self.h_ylim - 10, '', fontsize=12)
             self.f3text = self.ax.text(xmax + 5, self.h_ylim - 15, '', fontsize=12)
             self.f4text = self.ax.text(xmax + 5, self.h_ylim - 20, '', fontsize=12)
-        self.ax.plot(self.x, self.y1, c='r', ls='-', marker='o', mec='b', mfc='w')  ## 保存历史数据
-        self.ax.plot(self.x, self.y2, c='b', ls='--', marker='o', mec='b', mfc='w')  ## 保存历史数据
-        self.ax.plot(self.x, self.y3, c='g', ls='-.', marker='o', mec='b', mfc='w')
-        # self.ax.plot(self.x, self.y3, c='g', ls='-.', marker='o', mec='b', mfc='w')
-            # plt.plot(t, np.sin(t), 'o')
-        self.f1text.set_text('T1 (red) =   %.3f' % newy1)
-        self.f2text.set_text('T2 (blue) =  %.3f' % newy2)
-        self.f3text.set_text('TS (xxx) =   %.3f' % newy4)
-        self.f4text.set_text('TL (green) = %.3f' % newy3)
+        l1 = self.ax.plot(self.x, self.y1, c='r', ls='-', marker='^', mec='b', mfc='w',
+                          label='Inline label1')  ## 保存历史数据
+        l2 = self.ax.plot(self.x, self.y2, c='b', ls='--', marker='o', mec='b', mfc='w',
+                          label='Inline label2')  ## 保存历史数据
+        l3 = self.ax.plot(self.x, self.y3, c='b', ls='-.', marker='x', mec='b', mfc='w',
+                          label='Inline label3')  ## 保存历史数据
+        legend_ = self.ax.legend(['T1 (Liquid)=%.3f' % round(newy1,2), 'T2 (sensor) =%.3f' % round(newy2,2)
+                                      , 'T Lidar=%.3f' % round(newy3,2)], loc='best', fontsize=20, shadow=True
+                                  , edgecolor='blue')
+        # self.f1text.set_text('T1 (red) =   %.3f' % newy1)
+        # self.f2text.set_text('T2 (blue) =  %.3f' % newy2)
+        # self.f4text.set_text('TL (green) = %.3f' % newy3)
+        self.text.set_text('TS (xxx) =   %.3f' % newy4)
         plt.pause(0.1)
 
 # t = 0
