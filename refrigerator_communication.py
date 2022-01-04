@@ -225,7 +225,7 @@ class dynamic_figure():
 
         if xmax - newx < 0:
             self.ax.set_xlim(xmax, xmax + self.xlim)
-            self.f1text = self.ax.text(xmax + 5, self.h_ylim - 5, '', fontsize=12)
+            self.text = self.ax.text(xmax + 1, self.h_ylim - 5, '', fontsize=12)
             self.f2text = self.ax.text(xmax + 5, self.h_ylim - 10, '', fontsize=12)
             self.f3text = self.ax.text(xmax + 5, self.h_ylim - 15, '', fontsize=12)
             self.f4text = self.ax.text(xmax + 5, self.h_ylim - 20, '', fontsize=12)
@@ -252,12 +252,13 @@ class dynamic_figure():
 #     y2 = np.sin(t) + 0.2
 #     d_F.update(t, y1, y2)
 
-# Communication.Print_Used_Com()
-# Ret =False #是否创建成功标志
-#
-# Engine1 = Communication("/dev/ttyUSB0",19200,0.5)
-# if (Ret):
-#     print(Engine1.set_temperature(-50))
-#     print(Engine1.check_temperature(2))
-#     Engine1.Operation_options(1)
-    #Engine1.Recive_data(1)
+Communication.Print_Used_Com()
+Ret =False #是否创建成功标志
+
+Engine1 = Communication("/dev/ttyUSB0",19200,0.5)
+if (Ret):
+    print(Engine1.set_temperature(-0.1))  # cannot be set as 0
+    print(Engine1.check_temperature(1))
+    print(Engine1.check_temperature(2))
+    Engine1.Operation_options(1)
+    # Engine1.Recive_data(1)

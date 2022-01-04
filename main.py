@@ -60,10 +60,10 @@ if __name__ == '__main__':
                     Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body']['TempRX'])
                 except:
                     Lidar_cgi_break += 1
-                if current_tempera_1 > 15 and current_tempera_set > -69 and Lidar_tempera > 10:
-                    Engine1.set_temperature(-70)
-                elif current_tempera_1 < -30 and current_tempera_set < 19 and Lidar_tempera < -10:
-                    Engine1.set_temperature(20)
+                # if current_tempera_1 > 15 and current_tempera_set > -69 and Lidar_tempera > 10:
+                #     Engine1.set_temperature(-70)
+                # elif current_tempera_1 < -30 and current_tempera_set < 19 and Lidar_tempera < -10:
+                #     Engine1.set_temperature(20)
                 print('RS485 Temp is ' + str(round(current_tempera_1,2)) + ' ℃')
                 print('Envir temp is ' + str(round(current_tempera_2,2)) + ' ℃')
                 print('Target temp is ' + str(current_tempera_set) + ' ℃')
@@ -78,7 +78,7 @@ if __name__ == '__main__':
                 f.write(' ENTemp: ' + str(current_tempera_2))
                 f.write(' Target: ' + str(current_tempera_set))
                 f.write(' Lidar_T: ' + str(Lidar_tempera))
-                f.write('\n')
+                f.write('\n')                Lidar_tempera = 60
                 # if judge:
                 #     f.write('  Record Point Cloud')
                 #     f.write('\r\n')

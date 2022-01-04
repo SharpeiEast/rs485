@@ -35,4 +35,4 @@ def record_gene(lidar_id, length):
 
     return Lidar_cgi_break
 
-break_times = record_gene('0011', 100)
+break_times = record_gene('0011', 10000)
