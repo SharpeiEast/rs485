@@ -102,14 +102,14 @@ if __name__ == '__main__':
 
     relayClose(host, port, "1")
     time.sleep(1)
-    relayOpen(host, port, "1")
-    time.sleep(1)
-    relayClose(host, port, "2")
-    time.sleep(1)
-    relayOpen(host, port, "2")
-    time.sleep(1)
-    relayClose(host, port, "3")
-    time.sleep(1)
-    relayOpen(host, port, "3")
+    # relayOpen(host, port, "1")
+    # time.sleep(1)
+    # relayClose(host, port, "2")
+    # time.sleep(1)
+    # relayOpen(host, port, "2")
+    # time.sleep(1)
+    # relayClose(host, port, "3")
+    # time.sleep(1)
+    # relayOpen(host, port, "3")
 
 

@@ -151,10 +151,10 @@ if __name__ == '__main__':
     # for v in vlist:
     #     powerTest_by_supply(com, times, v, sn)
 
-    com = '/dev/ttyUSB1'
+    com = '/dev/ttyUSB0'
     cmd_text = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(com)
     os.popen(cmd_text).read()
 
     voltage = 24
-    power_port = '/dev/ttyUSB1'
+    power_port = '/dev/ttyUSB0'
     ser_turnOn(float(voltage), sport=power_port)
