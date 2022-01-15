@@ -155,6 +155,6 @@ if __name__ == '__main__':
     cmd_text = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(com)
     os.popen(cmd_text).read()
 
-    voltage = 24
-    power_port = '/dev/ttyUSB0'
+    voltage = 2
+    power_port = com
     ser_turnOn(float(voltage), sport=power_port)

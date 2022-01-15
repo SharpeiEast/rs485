@@ -8,35 +8,39 @@ import os
 import time
 from refrigerator_communication import Communication,dynamic_figure
 from qt_http_sender import CGI_CMD
+from qt_temperature_gas_control import Tempera_control
+from powerSupplyController import ser_turnOn
 
-def temp_difference_cgi_qt(Tx, lidar):  # lidar应该是一个类，qt = CGI_CMD(host='192.168.1.201')，Tx一般是恒温槽温度
-    RX_temp = lidar.cgi_get_factory_monitor()['Body']['TempRxAvrg'] #读取rx的平均温度
-    return Tx - float(RX_temp)
-
-# def temp_rising(lidar,Engine,target_tempera):
-#     Diff = temp_difference_cgi_qt(target_tempera, lidar)
-#     if Diff < 0:
-#         return '雷达温度超限，拔线降温'
-#     elif:
-#         Diff < 20:
-#
-#         return '逼近目标温度，调整温槽温度为： '
-#
-def temperas_record(lidar,Engine1,file_name):
-    return 1
 
 if __name__ == '__main__':
+
+    temperas = [-30, -19.6, 0, 10, 30, 50, 70, 85]  # QT升温范围
+    TC = Tempera_control(-40, 90)  # QT安全温度上下限
+    gas_sta = 0  # 吹气状态，0表示关闭，1表示开启
+    tempera_index = 'TempRX'  # 如果是B样雷达则更改为'TempAvrg'
+    refrigerator_port = '/dev/ttyUSB1'
+    powerSupply_port = '/dev/ttyUSB0'
+    cmd_text1 = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(refrigerator_port)
+    cmd_text2 = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(powerSupply_port)
+    os.popen(cmd_text1).read()
+    os.popen(cmd_text2).read()
+
     file_name = time.strftime("%Y-%m-%d~%H-%M-%S", time.localtime()) + '.txt'
     print('按下回车开始计时，按下 Ctrl + C 停止计时。')
-    Engine1 = Communication('/dev/ttyUSB0', 19200, 0.5)
+    Engine1 = Communication(refrigerator_port, 19200, 0.5)
+    Engine1.Operation_options(1)
+    Engine1.set_temperature(-50)
+    voltage = 24
+    ser_turnOn(float(voltage), sport=powerSupply_port)
     Lidar = CGI_CMD(host='192.168.1.201')
     d_figure = dynamic_figure(80,-50,120)
     Lidar_cgi_break = 0
     try:
-        Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body']['TempRX'])
+        Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body'][tempera_index])
         print('雷达温度：', Lidar_tempera)
     except:
         print('胖子，你没接雷达')
+        time.sleep(5000)
 
     while True:
         input("")  # 如果是 python 2.x 版本请使用 raw_input()
@@ -57,18 +61,24 @@ if __name__ == '__main__':
                 current_tempera_set = Engine1.check_temperature(3)
                 # Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body']['TempRX'])
                 try:
-                    Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body']['TempRX'])
+                    Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body'][tempera_index])
                 except:
                     Lidar_cgi_break += 1
                 # if current_tempera_1 > 15 and current_tempera_set > -69 and Lidar_tempera > 10:
                 #     Engine1.set_temperature(-70)
                 # elif current_tempera_1 < -30 and current_tempera_set < 19 and Lidar_tempera < -10:
                 #     Engine1.set_temperature(20)
+                gas_sta = TC.gas_control(Lidar_tempera, 40, gas_sta)
+                temperas, temp_target = TC.target_temp(Lidar_tempera, temperas, 30.1)
+                if temp_target != False:
+                    print('set tempera as: ', temp_target)
+                    Engine1.set_temperature(temp_target)
+
                 print('RS485 Temp is ' + str(round(current_tempera_1,2)) + ' ℃')
                 print('Envir temp is ' + str(round(current_tempera_2,2)) + ' ℃')
                 print('Target temp is ' + str(current_tempera_set) + ' ℃')
                 print('Lidar temp is ' + str(Lidar_tempera) + ' ℃')
-                d_figure.update(round(time.time() - starttime, 0), current_tempera_1, current_tempera_2,Lidar_tempera,current_tempera_set)
+                d_figure.update(round(time.time() - starttime, 0), current_tempera_1, current_tempera_2,Lidar_tempera, current_tempera_set)
                 print('*'*20)
               #  print('t_list: ',t_list)
               #  print(judge)
@@ -78,7 +88,8 @@ if __name__ == '__main__':
                 f.write(' ENTemp: ' + str(current_tempera_2))
                 f.write(' Target: ' + str(current_tempera_set))
                 f.write(' Lidar_T: ' + str(Lidar_tempera))
-                f.write('\n')                Lidar_tempera = 60
+                f.write('\n')
+                # Lidar_tempera = 60
                 # if judge:
                 #     f.write('  Record Point Cloud')
                 #     f.write('\r\n')

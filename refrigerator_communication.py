@@ -253,17 +253,21 @@ class dynamic_figure():
 #     y2 = np.sin(t) + 0.2
 #     d_F.update(t, y1, y2)
 
-# com = '/dev/ttyUSB1'
+
+
+    # com = '/dev/ttyUSB1'
 # cmd_text = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(com)
 # os.popen(cmd_text).read()
 #
-# Communication.Print_Used_Com()
-# Ret =False #是否创建成功标志
-#
-# Engine1 = Communication("/dev/ttyUSB1",19200,0.5)
-# if (Ret):
-    # print(Engine1.set_temperature(-0.1))  # cannot be set as 0
-    # print(Engine1.check_temperature(1))
-    # print(Engine1.check_temperature(3))
-    # Engine1.Operation_options(1)
-    # Engine1.Recive_data(1)
+if __name__ == '__main__':
+    Communication.Print_Used_Com()
+    Ret =False #是否创建成功标志
+
+    Engine1 = Communication("/dev/ttyUSB0",19200,0.5)
+    if (Ret):
+        print('导热液体温度:', Engine1.check_temperature(1))
+        print('内部环境温度:', Engine1.check_temperature(2))
+        print('液体设定温度:', Engine1.check_temperature(3))
+        # Engine1.Operation_options(1)
+        # print(Engine1.set_temperature(-70))  # cannot be set as 0
+        # Engine1.Recive_data(1)

@@ -1,58 +1,26 @@
+# This is a sample Python script.
 
-
+# Press Shift+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
 import os
 import time
 from refrigerator_communication import Communication,dynamic_figure
-from foundation_class import Lydar
+from qt_http_sender import CGI_CMD
 from qt_temperature_gas_control import Tempera_control
-
-
-# class Tempera_control():
-#     def __init__(self, ceiling,floor):
-#         self.ceiling = ceiling
-#         self.floor = floor
-#
-#     def gas_control(self, temp, t_banchmark, gas_status):
-#         host = "192.168.1.210"
-#         port = 8089
-#         if temp < t_banchmark and gas_status == 0:
-#             relayOpen(host, port, "1")
-#             gas_status = 1
-#             time.sleep(1)
-#         elif temp > t_banchmark and gas_status == 1:
-#             relayClose(host, port, "1")
-#             gas_status = 0
-#             time.sleep(1)
-#         elif temp > self.ceiling and gas_status == 0:
-#             relayOpen(host, port, "1")
-#             gas_status = 2
-#             time.sleep(1)
-#         return gas_status
-#
-#     def target_temp(self, temp, temperas):
-#         # temperas = [0,10,30,50,70,90,110]
-#         if len(temperas) != 0:
-#             if temp > temperas[0]:
-#                 last_temp = temperas.pop(0)
-#                 return temperas, min(last_temp + 30.1, self.ceiling)
-#             else:
-#                 return temperas, False
-#         else:
-#             if temp > self.ceiling:
-#                 return temperas, 0.1
-#             else:
-#                 return temperas, False
+from powerSupplyController import ser_turnOn
+from foundation_class import Lydar
 
 
 if __name__ == '__main__':
-    temperas = [-30, -15, 0, 15, 30, 45, 60, 75, 90]  # AT升温范围
-    TC = Tempera_control(-40, 110)  # AT安全温度上下限
+
+    temperas = [-15, 0, 10, 20, 30, 40, 50]  # QT升温范围
+    TC = Tempera_control(-20, 65)  # XT安全温度上下限
     gas_sta = 0  # 吹气状态，0表示关闭，1表示开启
-    tempera_index = 'work_temp'  #
+    tempera_index = 'TempA_RFB_1'
     refrigerator_port = '/dev/ttyUSB0'
-    # powerSupply_port = '/dev/ttyUSB0'
+    # powerSupply_port = '/dev/ttyUSB1'
     cmd_text1 = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(refrigerator_port)
     # cmd_text2 = 'echo "123456" | sudo -S sudo chmod 777 {}'.format(powerSupply_port)
     os.popen(cmd_text1).read()
@@ -62,19 +30,18 @@ if __name__ == '__main__':
     print('按下回车开始计时，按下 Ctrl + C 停止计时。')
     Engine1 = Communication(refrigerator_port, 19200, 0.5)
     Engine1.Operation_options(1)
-    Engine1.set_temperature(-70)
+    Engine1.set_temperature(-0.1)
     # voltage = 24
     # ser_turnOn(float(voltage), sport=powerSupply_port)
     Lidar = Lydar()
     Lidar.__get_binfo_from_udp__()
-    dict_inf = Lidar.get_statistic_cgi()
-    d_figure = dynamic_figure(80,-50,120)
+    d_figure = dynamic_figure(80, -50, 120)
     Lidar_cgi_break = 0
     try:
-        Lidar_tempera = float(dict_inf[tempera_index])
+        Lidar_tempera = Lidar.parse_reserved_bits_onerow()['TempA_RFB_1']
         print('雷达温度：', Lidar_tempera)
     except:
-        print('胖子，你没接雷达!')
+        print('胖子，你没接雷达')
 
     while True:
         input("")  # 如果是 python 2.x 版本请使用 raw_input()
@@ -83,7 +50,6 @@ if __name__ == '__main__':
         print('开始')
         try:
             while True:
-                print('-' * 20)
                 print('计时: ', round(time.time() - starttime, 0), '秒')  # , end="\r")
                 f = open(file_name, 'a')
                 f.write('time:' + str(round( time.time()  - starttime, 1) )+ '秒')
@@ -94,21 +60,18 @@ if __name__ == '__main__':
                 current_tempera_1 = Engine1.check_temperature(1)
                 current_tempera_2 = Engine1.check_temperature(2)
                 current_tempera_set = Engine1.check_temperature(3)
-                print('温槽温度采集完毕')
                 # Lidar_tempera = float(Lidar.cgi_get_factory_monitor()['Body']['TempRX'])
                 try:
-                    Lidar_tempera = float(Lidar.get_statistic_cgi()[tempera_index])
+                    Lidar_tempera = float(Lidar.parse_reserved_bits_onerow()['TempA_RFB_1'])
                 except:
                     Lidar_cgi_break += 1
-                    print('雷达掉线 + 1')
-                gas_sta = TC.gas_control(Lidar_tempera, 50, gas_sta)
+                gas_sta = TC.gas_control(Lidar_tempera, 40, gas_sta)
                 temperas, temp_target = TC.target_temp(Lidar_tempera, temperas, 30.1)
                 if temp_target != False:
-                # if isinstance(temp_target, float):
                     print('set tempera as: ', temp_target)
                     Engine1.set_temperature(temp_target)
-                # print('gas-sta: ', gas_sta)
-                # print('tempera_target: ', temp_target)
+                print('gas_sta: ', gas_sta)
+                print('tempera_target: ', temp_target)
 
                 # if current_tempera_1 > 15 and current_tempera_set > -69 and Lidar_tempera > 10:
                 #     Engine1.set_temperature(-70)
@@ -122,6 +85,7 @@ if __name__ == '__main__':
                 print('*'*20)
               #  print('t_list: ',t_list)
               #  print(judge)
+                print('-'*20)
                 # f = open('record_tempera.txt', 'a')
                 f.write(' RSTemp: ' + str(current_tempera_1))
                 f.write(' ENTemp: ' + str(current_tempera_2))
